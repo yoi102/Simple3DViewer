@@ -1,0 +1,18 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="Resources/Resources.csproj" Id="c7a23260-5ed1-4759-b0dd-a04c0770da4e" />
+  <Project Path="Simple3DViewer.Shared/Simple3DViewer.Shared.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Simple3DViewer.Winform.Controls/Simple3DViewer.Winform.Controls.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Simple3DViewer.wpf.Controls/Simple3DViewer.wpf.Controls.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="Simple3DViewer.wpf/Simple3DViewer.wpf.csproj">
+    <Platform Project="x64" />
+  </Project>
+</Solution>

@@ -1,0 +1,159 @@
+﻿<mah:MetroWindow x:Class="Simple3DViewer.wpf.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:local="clr-namespace:Simple3DViewer.wpf"
+                 xmlns:yr="https://github.com/yoi102/xaml/controls"
+                 xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 xmlns:r="clr-namespace:Resources;assembly=Resources"
+                 xmlns:cv="clr-namespace:Simple3DViewer.wpf.Converters"
+                 xmlns:ex="clr-namespace:Simple3DViewer.wpf.Extensions"
+                 xmlns:ov="clr-namespace:Simple3DViewer.Winform.Controls.OdaVisualize;assembly=Simple3DViewer.Winform.Controls"
+                 d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
+                 mc:Ignorable="d"
+                 Title="{I18N {x:Static r:LangKeys.Simple3DViewer}}"
+                 Topmost="{Binding Topmost}"
+                 TitleAlignment="Left"
+                 TitleCharacterCasing="Normal"
+                 WindowStartupLocation="CenterScreen"
+                 Height="1000"
+                 Width="1500">
+    <mah:MetroWindow.Resources>
+        <cv:EnumToEnumConverter x:Key="ToRenderMode"
+                                TargetEnumType="{x:Type ov:RenderMode}"
+                                SourceEnumType="{x:Type local:ViewerRenderMode}" />
+        <cv:EnumToEnumConverter x:Key="ToDraggerType"
+                                TargetEnumType="{x:Type ov:DraggerType}"
+                                SourceEnumType="{x:Type local:ViewerDraggerType}" />
+
+    </mah:MetroWindow.Resources>
+    <mah:MetroWindow.LeftWindowCommands>
+        <mah:WindowCommands>
+            <Button  Content="{md:PackIcon Kind=Github, Size=20}"
+                     Click="IconClicked"
+                     Width="35"
+                     Height="22" />
+        </mah:WindowCommands>
+    </mah:MetroWindow.LeftWindowCommands>
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+
+            <StackPanel Orientation="Horizontal">
+                <ToggleButton Style="{StaticResource MaterialDesignActionSecondaryToggleButton}"
+                              Content="{md:PackIcon Kind=PinOff,  Size=20}"
+                              Command="{Binding ChangeTopmostCommand}"
+                              Background="Transparent"
+                              Foreground="White"
+                              md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=Pin}" />
+                <ToggleButton md:ToggleButtonAssist.OnContent="{md:PackIcon Kind=WeatherNight}"
+                              Background="Transparent"
+                              Content="{md:PackIcon Kind=WhiteBalanceSunny,Size=20}"
+                              Foreground="White"
+                              IsChecked="{Binding IsDarkTheme}"
+                              Style="{StaticResource MaterialDesignActionSecondaryToggleButton}" />
+
+                <Menu VerticalAlignment="Center"
+                      md:MenuAssist.TopLevelMenuItemHeight="25"
+                      Width="70">
+                    <MenuItem Foreground="White"
+                              Header="{Binding CurrentCultureLCID, Converter={x:Static cv:LCIDToStringConverter.Instance}}">
+                        <MenuItem Command="{Binding ChangeCultureCommand}"
+                                  CommandParameter="1033"
+                                  Foreground="{DynamicResource MaterialDesignBody}"
+                                  Header="EN" />
+                        <MenuItem Command="{Binding ChangeCultureCommand}"
+                                  CommandParameter="1041"
+                                  Foreground="{DynamicResource MaterialDesignBody}"
+                                  Header="JP" />
+                        <MenuItem Command="{Binding ChangeCultureCommand}"
+                                  CommandParameter="2052"
+                                  Foreground="{DynamicResource MaterialDesignBody}"
+                                  Header="CN" />
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
+    <md:DialogHost Identifier="MainView"
+                   DialogTheme="Inherit">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Width="150">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Button Content="{I18N {x:Static r:LangKeys.OpenFile}}"
+                        Command="{Binding OpenFileCommand}"
+                        FontWeight="Bold"
+                        Margin="10"
+                        Height="80" />
+                <StackPanel Grid.Row="1">
+                    <StackPanel Margin="0 5 0 0"
+                                Orientation="Horizontal">
+                        <ToggleButton IsChecked="{Binding ShowFPS}" />
+                        <Label Content="{I18N {x:Static r:LangKeys.ShowFPS}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 5 0 0"
+                                Orientation="Horizontal">
+                        <ToggleButton IsChecked="{Binding ShowWCS}" />
+                        <Label Content="{I18N {x:Static r:LangKeys.ShowWCS}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 5 0 0"
+                                Orientation="Horizontal">
+                        <ToggleButton IsChecked="{Binding ShowViewCube}" />
+                        <Label Content="{I18N {x:Static r:LangKeys.ShowViewCube}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 10 0 0"
+                                Orientation="Vertical">
+                        <Label FontWeight="Bold"
+                               Content="{I18N {x:Static r:LangKeys.RenderMode}}" />
+                        <ComboBox SelectedItem="{Binding RenderMode}"
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerRenderMode}}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 10 0 0"
+                                Orientation="Vertical">
+                        <Label FontWeight="Bold"
+                               Content="{I18N {x:Static r:LangKeys.LeftButtonDragger}}" />
+                        <ComboBox SelectedItem="{Binding LeftButtonDragger}"
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 10 0 0"
+                                Orientation="Vertical">
+                        <Label FontWeight="Bold"
+                               Content="{I18N {x:Static r:LangKeys.MiddleButtonDragger}}" />
+                        <ComboBox SelectedItem="{Binding MiddleButtonDragger}"
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                    </StackPanel>
+                    <StackPanel Margin="0 10 0 0"
+                                Orientation="Vertical">
+                        <Label FontWeight="Bold"
+                               Content="{I18N {x:Static r:LangKeys.RightButtonDragger}}" />
+                        <ComboBox SelectedItem="{Binding RightButtonDragger}"
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <yr:OdaVisualizeViewer x:Name="_viewer"
+                                       IsEnabled="{Binding OpenFileCommand.IsRunning,Converter={cv:NotBooleanConverter}}"
+                                       OdaVisualizeContext="{Binding OdaVisualizeContext}"
+                                       ShowFPS="{Binding ShowFPS}"
+                                       ShowViewCube="{Binding ShowViewCube}"
+                                       ShowWCS="{Binding ShowWCS}"
+                                       RenderMode="{Binding RenderMode,Converter={StaticResource ToRenderMode}}"
+                                       LeftButtonDragger="{Binding LeftButtonDragger ,Converter={StaticResource ToDraggerType}}"
+                                       MiddleButtonDragger="{Binding MiddleButtonDragger,Converter={StaticResource ToDraggerType}}"
+                                       RightButtonDragger="{Binding RightButtonDragger,Converter={StaticResource ToDraggerType}}" />
+            </Grid>
+        </Grid>
+    </md:DialogHost>
+</mah:MetroWindow>

@@ -1,0 +1,31 @@
+SCHEMA TUTORIAL_SCHEMA;
+ 
+  TYPE SchemaName = STRING (256); END_TYPE;
+  
+  ENTITY GfPoint;
+    coordinates: LIST [2:3] OF REAL;
+  END_ENTITY;
+  
+  ENTITY GfVector;
+    coordinates: LIST [2:3] OF REAL;
+  END_ENTITY;
+  
+  ENTITY GfCurve
+   ABSTRACT SUPERTYPE OF (ONEOF(GfCircle, GfPolyline));
+    name: OPTIONAL SchemaName;
+  END_ENTITY;
+
+  ENTITY GfCircle
+   SUBTYPE OF (GfCurve);
+    center: GfPoint;
+    radius: REAL;
+   WHERE
+    wr_positive_radius: radius > 0.;
+  END_ENTITY;
+
+  ENTITY GfPolyline
+   SUBTYPE OF (GfCurve);
+    points: LIST [2:?] OF GfPoint;
+  END_ENTITY;
+  
+END_SCHEMA;

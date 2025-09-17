@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Simple3DViewer.wpf.View.Dialogs.ProgressDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:r="clr-namespace:Resources;assembly=Resources"
+             xmlns:local="clr-namespace:Simple3DViewer.wpf.View.Dialogs"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Margin="16">
+        <ProgressBar Margin="16"
+                     HorizontalAlignment="Center"
+                     IsIndeterminate="True"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Value="0" />
+        <Button HorizontalAlignment="Center"
+                x:Name="CancelButton"
+                Click="CancelButtonClicked"
+                Content="{I18N {x:Static r:LangKeys.Cancel}}"
+                Style="{StaticResource MaterialDesignFlatButton}" />
+
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,22 @@
+[
+	{
+		"entity_name" : "Part",
+		"field_name" : "Versions",
+		"declare_macros": "ODRX_DAI_DECLARE_RX_PROPERTY_COLLECTION_TREE",
+		"declare_is_simple": "true",
+		"declare_addition_params": ["OdDAIObjectIds", "\"\"", "\"Contains elements\"", "\"Object Definition\""],
+		"define_macros": "OD_DAI_DEFINE_COLLECTION_TREE_PROPERTY",
+		"define_addition_params": ["OdDAIObjectIds"],
+		"define_is_simple": "true",
+	},
+	{
+		"entity_name" : "PartVersion",
+		"field_name" : "Views",
+		"declare_macros": "ODRX_DAI_DECLARE_RX_PROPERTY_COLLECTION_TREE",
+		"declare_is_simple": "true",
+		"declare_addition_params": ["OdDAIObjectIds", "\"\"", "\"Contains elements\"", "\"Object Definition\""],
+		"define_macros": "OD_DAI_DEFINE_COLLECTION_TREE_PROPERTY",
+		"define_addition_params": ["OdDAIObjectIds"],
+		"define_is_simple": "true",
+	}
+]

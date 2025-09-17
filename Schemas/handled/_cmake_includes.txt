@@ -1,0 +1,3 @@
+${STEP_ROOT}/Include
+${STEP_ROOT}/Include/Common
+${STEP_ROOT}/Source/IfcCore

@@ -1,0 +1,510 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Simple3DViewer.Shared\Simple3DViewer.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ExBrepBuilderSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExBrepBuilderSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExDgnCreateSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExDgnCreateSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExDgnDumpSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExDgnDumpSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExDgnReadWriteSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExDgnReadWriteSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExDgnVectorizeSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExDgnVectorizeSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExDwgDgnViewerSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\ExDwgDgnViewerSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExStepReadFileSwig_Net8">
+      <HintPath>..\OdaDlls\Step\ExStepReadFileSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ExStepVectorizeSwig_Net8">
+      <HintPath>..\OdaDlls\Step\ExStepVectorizeSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MultiThreadedDumper_Net8">
+      <HintPath>..\OdaDlls\Drawings\MultiThreadedDumper_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdaDgnAppSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdaDgnAppSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdaDwgAppSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdaDwgAppSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdaSDK_First_Net_App_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdaSDK_First_Net_App_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdBagFilerExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdBagFilerExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdBrExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdBrExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdColladaExportExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdColladaExportExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdCreationNetSwigExampleLib_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdCreationNetSwigExampleLib_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdExGUIComponentsLib_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdExGUIComponentsLib_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdExNonCOMPropertiesSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdExNonCOMPropertiesSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdExStepViewerSwig_Net8">
+      <HintPath>..\OdaDlls\Step\OdExStepViewerSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdExSwigCustomCommand_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdExSwigCustomCommand_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdExVisualizeFormatsConverterSwig_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdExVisualizeFormatsConverterSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdGetGeomExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdGetGeomExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdReadExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdReadExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSvgExportExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSvgExportExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcDbPointCloudObj_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcDbPointCloudObj_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcDgnLS_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcDgnLS_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcGeolocationObj_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcGeolocationObj_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcIdViewObj_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcIdViewObj_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Acis2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Acis2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcModelDocObj_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcModelDocObj_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AcTrace_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AcTrace_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AECIIB_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AECIIB_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_AutoSurfServices_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_AutoSurfServices_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Bim2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Bim2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DbConstraints_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DbConstraints_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DbCryptModule_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DbCryptModule_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DbProperties_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DbProperties_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DgGeoDataEx_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DgGeoDataEx_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Dgn2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Dgn2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DgPlotStyleServices_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DgPlotStyleServices_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DgProperties_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DgProperties_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DOMAINMODEL_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_DOMAINMODEL_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Dwf2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Dwf2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Dwg2Step_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_Dwg2Step_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Dwg2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Dwg2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_DwgConstraints_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_DwgConstraints_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_ExDgnDumper_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_ExDgnDumper_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_ExternalTableData_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_ExternalTableData_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_ExVisualizeDevice_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_ExVisualizeDevice_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_FacetModeler_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_FacetModeler_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Gltf2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Gltf2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_GLTFImport_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_GLTFImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Ifc2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Ifc2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_ModelerGeometry_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_ModelerGeometry_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Nw2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Nw2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_NwRecapImport_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_NwRecapImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Obj2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Obj2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_OBJToolkit_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_OBJToolkit_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_OdBrepModeler_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_OdBrepModeler_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_OdGeoData_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_OdGeoData_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_OdSpatialReference_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_OdSpatialReference_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_OdVisualize2PrcExport_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_OdVisualize2PrcExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_PDFiumModule_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_PDFiumModule_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_PlotSettingsValidator_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_PlotSettingsValidator_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_PointCloud2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_PointCloud2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Prc2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Prc2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_RasterProcessor_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_RasterProcessor_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Rcs2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Rcs2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_RecomputeDimBlock_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_RecomputeDimBlock_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_RxCommonDataAccess_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_RxCommonDataAccess_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_sdai_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_sdai_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_SoftwareRendering2D_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_SoftwareRendering2D_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Step2Dwg_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_Step2Dwg_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Step2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Step2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_StepCoreTools_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_StepCoreTools_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_StepCore_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_StepCore_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_StepGeom_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_StepGeom_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Stl2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Stl2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_STLImport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_STLImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TAcisDb_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TAcisDb_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TDwfDb_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TDwfDb_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_2dExport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_2dExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_3DSolidHistory_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_3DSolidHistory_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_AcisBuilder_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_AcisBuilder_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Ave_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_Ave_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_BrepBuilderFiller_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_BrepBuilderFiller_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_BrepRenderer_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_BrepRenderer_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_ColladaExport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_ColladaExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_ColladaImport_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_ColladaImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_ColorBookReader_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_ColorBookReader_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_DbCoreIntegrated_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_DbCoreIntegrated_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_DbJoinEntityPE_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_DbJoinEntityPE_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_DgnExport_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_DgnExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_DgnImport_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_DgnImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Dwf7Export_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_Dwf7Export_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Dwf7Import_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_Dwf7Import_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_GsBackground_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_GsBackground_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Iesna_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_Iesna_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_PdfExport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_PdfExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_PdfImport_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_PdfImport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_PDFToolkit_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_PDFToolkit_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_PSToolkit_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_PSToolkit_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_RootIntegrated_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_RootIntegrated_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Sm_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_Sm_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_STLExport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_STLExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_TfCore_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_TfCore_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_Tf_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TD_Tf_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TD_ThreejsJSONExport_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TD_ThreejsJSONExport_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TG_Db_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TG_Db_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TG_ModelerGeometry_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdSwig_TG_ModelerGeometry_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TRseDb_Net8">
+      <HintPath>..\OdaDlls\Kernel\OdSwig_TRseDb_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TV_VisualizeTools_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_TV_VisualizeTools_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_TV_Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_TV_Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Visualize2Nwd_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Visualize2Nwd_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Visualize2Obj_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Visualize2Obj_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Visualize2Pdf_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Visualize2Pdf_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Visualize2Vsf_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Visualize2Vsf_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Visualize2Xml_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Visualize2Xml_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_VisualizeAlloc_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_VisualizeAlloc_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Vsf2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Vsf2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_Xml2Visualize_Net8">
+      <HintPath>..\OdaDlls\Visualize\OdSwig_Xml2Visualize_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdSwig_zipio_Net8">
+      <HintPath>..\OdaDlls\Step\OdSwig_zipio_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OdWriteExSwig_Net8">
+      <HintPath>..\OdaDlls\Drawings\OdWriteExSwig_Net8.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

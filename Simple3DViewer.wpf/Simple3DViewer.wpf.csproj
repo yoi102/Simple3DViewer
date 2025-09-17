@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Resources\Resources.csproj" />
+    <ProjectReference Include="..\Simple3DViewer.Shared\Simple3DViewer.Shared.csproj" />
+    <ProjectReference Include="..\Simple3DViewer.wpf.Controls\Simple3DViewer.wpf.Controls.csproj" />
+  </ItemGroup>
+	<PropertyGroup>
+		<!-- 上一级的 Schemas 和 OdaDlls 路径 -->
+		<ExternalSchemasRoot>$(ProjectDir)..\Schemas\</ExternalSchemasRoot>
+		<ExternalOdaDllsRoot>$(ProjectDir)..\OdaDlls\</ExternalOdaDllsRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Schemas：递归包含所有文件，保持层级 -->
+		<SchemaFiles Include="$(ExternalSchemasRoot)**\*.*" />
+
+		<!-- OdaDlls：递归包含所有文件，稍后扁平化 -->
+		<OdaDllsFiles Include="$(ExternalOdaDllsRoot)**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Antelcat.I18N.WPF" Version="1.1.0" />
+	  <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	  <PackageReference Include="MahApps.Metro" Version="3.0.0-rc0525" />
+	  <PackageReference Include="MaterialDesignThemes.MahApps" Version="5.3.0-ci1117" />
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0-rc.1.25451.107" />
+	</ItemGroup>
+
+	<Target Name="PostCopyAssets" AfterTargets="Build">
+		<!-- 确保目标目录存在 -->
+		<MakeDir Directories="$(OutDir)Schemas" />
+		<MakeDir Directories="$(OutDir)OdaDlls" />
+
+		<!-- 1) Schemas：保留目录层级 -->
+		<Copy SourceFiles="@(SchemaFiles)" DestinationFiles="@(SchemaFiles->'$(OutDir)Schemas\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+
+		<!-- 2) OdaDlls：扁平化到 exe 下的 OdaDlls 文件夹 -->
+		<Copy SourceFiles="@(OdaDllsFiles)" DestinationFiles="@(OdaDllsFiles->'$(OutDir)OdaDlls\%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+	</Target>
+
+	<!-- 可选：在 Clean 时清掉输出里的 Schemas / OdaDlls -->
+	<Target Name="CleanCopiedAssets" AfterTargets="Clean">
+		<RemoveDir Directories="$(OutDir)Schemas" />
+		<RemoveDir Directories="$(OutDir)OdaDlls" />
+	</Target>
+
+</Project>
