@@ -1,6 +1,6 @@
 **Simple3DViewer — 基于 ODA SDK 的简易 3D 查看器Demo**
 
-- 基于 ODA SDK 实现。
+
 
 **遗憾点**
 
