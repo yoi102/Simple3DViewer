@@ -2,16 +2,32 @@
 using ODA.Visualize.TV_Visualize;
 using Simple3DViewer.Shared.Extensions;
 using Simple3DViewer.Shared.Scopes;
+using System.Runtime.InteropServices;
 
 namespace Simple3DViewer.Winform.Controls.OdaVisualize.Draggers;
 
 internal class OdTvSelectDragger : OdTvDragger
 {
+    [DllImport("user32.dll")]
+    private static extern short GetAsyncKeyState(int vKey);
+
+    /// <summary>
+    /// 判断某个键是否正在按下（全局，不需要窗口聚焦）
+    /// </summary>
+    public static bool IsKeyDown(Keys key)
+    {
+        return (GetAsyncKeyState((int)key) & 0x8000) != 0;
+    }
+
+    /// <summary>
+    /// 判断某个键是否刚刚按过一次（全局，不需要窗口聚焦）
+    /// </summary>
+    public static bool WasKeyPressed(Keys key)
+    {
+        return (GetAsyncKeyState((int)key) & 0x1) != 0;
+    }
+
     public delegate void ObjectSelectedHandler(OdTvSelectionSet sSet, OdTvModelId modelId);
-
-    public event ObjectSelectedHandler? ObjectSelected;
-
-    public event ObjectSelectedHandler? ObjectsSelected;
 
     private enum SelectState
     {
@@ -54,8 +70,8 @@ internal class OdTvSelectDragger : OdTvDragger
     {
         using MemoryManagerScope _ = new();
 
-        _pts[0] = new OdTvDCPoint();
-        _pts[1] = new OdTvDCPoint();
+        _pts[0] = new();
+        _pts[1] = new();
 
         _modelId = modelId;
         // In this dragger we will be used a separate special view for drawing temporary objects like selection rectangles
@@ -67,7 +83,7 @@ internal class OdTvSelectDragger : OdTvDragger
         // Get specific linetype for the selection rectangle boundary
         OdTvDatabaseId dbId = _modelId.openObject().getDatabase();
         _frameLinetypeId = dbId.openObject().findLinetype(TvSelectorLinetype);
-        if (_frameLinetypeId.isNull())
+        if (_frameLinetypeId.IsNull())
         {
             // Create custom linetype for the selection rectangle boundary
             OdTvLinetypeElement dash = OdTvLinetypeDashElement.createObject(0.25);
@@ -95,6 +111,47 @@ internal class OdTvSelectDragger : OdTvDragger
 
     public override DraggerResult NextPoint(int x, int y)
     {
+        NeedFreeDrag = true;
+        //remember first click
+        _firstDevicePt.x = x;
+        _firstDevicePt.y = y;
+        _pts[0] = new OdTvDCPoint(_firstDevicePt.x, _firstDevicePt.y);
+        _pts[1] = new OdTvDCPoint(_firstDevicePt.x, _firstDevicePt.y);
+        _state = SelectState.kPoint;
+        return DraggerResult.NothingToDo;
+    }
+
+    public override DraggerResult Drag(int x, int y)
+    {
+        if (_firstDevicePt.x == x &&
+            _firstDevicePt.y == y)
+            return DraggerResult.NothingToDo;
+
+        //filter coordinates
+        if ((x >= _viewControl.Width || x < 1) || (y >= _viewControl.Height || y < 1))
+            return DraggerResult.NothingToDo;
+
+        if (_state == SelectState.kPoint)
+        {
+            EnableTemporaryObjects();
+        }
+        _state = SelectState.kWindow;
+
+        using MemoryManagerScope _ = new();
+
+        // create temporary geometry if need
+        OdTvEntity? entity = null;
+        if (!_entityId.IsNull())
+            entity = _entityId.openObject(OdTv_OpenMode.kForWrite);
+        UpdateFrame(entity == null, x, y);
+
+        return DraggerResult.NeedUpdateView;
+    }
+
+    public override DraggerResult NextPointUp(int x, int y)
+    {
+        NeedFreeDrag = false;
+
         DraggerResult rc = DraggerResult.NothingToDo;
         //first of all we need the active view to perform selection
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
@@ -109,48 +166,24 @@ internal class OdTvSelectDragger : OdTvDragger
         //perform selection
         if (_state == SelectState.kPoint)
         {
-            //remember first click
-            _firstDevicePt.x = x;
-            _firstDevicePt.y = y;
-            _pts[0] = new OdTvDCPoint(_firstDevicePt.x, _firstDevicePt.y);
-            _pts[1] = new OdTvDCPoint(_firstDevicePt.x, _firstDevicePt.y);
             //update base color
             UpdateBaseColor();
             _opt.setMode(OdTvSelectionOptions_Mode.kPoint);
         }
         else
         {
-            //remember second click
             _pts[1] = new OdTvDCPoint(x, y);
-
-            if (_state == SelectState.kWindow)
-                _opt.setMode(OdTvSelectionOptions_Mode.kWindow);
-            else
+            if (_state == SelectState.kCrossing)
                 _opt.setMode(OdTvSelectionOptions_Mode.kCrossing);
+            else
+                _opt.setMode(OdTvSelectionOptions_Mode.kWindow);
 
             // setup temporary view and model
             DisableTemporaryObjects();
-
-            //mark that we need to update the view
-            rc = DraggerResult.NeedUpdateView;
         }
 
         // prepare data for the selection call
-        OdTvSelectionSet pSSet = _view.select(_pts, _opt, _modelId);
-
-        //check selection results
-        if (pSSet != null && pSSet.numItems() == 0 && _state == SelectState.kPoint) // start window or crossing mode
-        {
-            _state = SelectState.kWindow;
-
-            // setup temporary view and model
-            EnableTemporaryObjects();
-
-            //mark that we want to receive drag without pressed mouse button
-            NeedFreeDrag = true;
-        }
-        else if (_state != SelectState.kPoint)
-            _state = SelectState.kPoint;
+        OdTvSelectionSet? pSSet = _view?.select(_pts, _opt, _modelId);
 
         if (pSSet != null && pSSet.numItems() != 0)
         {
@@ -161,25 +194,8 @@ internal class OdTvSelectDragger : OdTvDragger
             rc = DraggerResult.NeedUpdateView;
         }
 
+        _state = SelectState.kPoint;
         return rc;
-    }
-
-    public override DraggerResult Drag(int x, int y)
-    {
-        if (_state == SelectState.kPoint)
-            return DraggerResult.NothingToDo;
-
-        //filter coordinates
-        if ((x >= _viewControl.Width || x < 1) || (y >= _viewControl.Height || y < 1))
-            return DraggerResult.NothingToDo;
-        using MemoryManagerScope _ = new();
-        // create temporary geometry if need
-        OdTvEntity? entity = null;
-        if (!_entityId.IsNull())
-            entity = _entityId.openObject(OdTv_OpenMode.kForWrite);
-        UpdateFrame(entity == null, x, y);
-
-        return DraggerResult.NeedUpdateView;
     }
 
     public override DraggerResult ProcessEscape()
@@ -239,7 +255,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void UpdateFrame(bool bCreate, int x, int y)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryManagerScope _ = new MemoryManagerScope();
 
         OdGePoint3d[] pts = new OdGePoint3d[5];
 
@@ -345,60 +361,62 @@ internal class OdTvSelectDragger : OdTvDragger
         if (sSet == null)
             return;
 
-        // always clear previous selection set
-        if (_viewControl.SelectionSet != null)
-        {
+        bool isPointMode = sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kPoint;
+        //remove highlight from previous selection set
+        if (_viewControl.SelectionSet is not null)
             Highlight(_viewControl.SelectionSet, false);
-            _viewControl.SelectionSet.Dispose();
-            _viewControl.SelectionSet = null;
-        }
 
-        if (_opt.getLevel() != OdTvSelectionOptions_Level.kEntity)
+        if (_viewControl.SelectionSet is null || !IsKeyDown(Keys.ControlKey))
         {
+            _viewControl.SelectionSet?.Dispose();
             _viewControl.SelectionSet = sSet;
-            Highlight(_viewControl.SelectionSet, true);
-            return;
         }
-
-        if (ObjectSelected != null)
+        else
         {
-            if (sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kPoint)
-                ObjectSelected?.Invoke(sSet, _modelId);
-            else
-                ObjectsSelected?.Invoke(sSet, _modelId);
-        }
-
-        if (sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kWindow ||
-            sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kCrossing)
-        {
-            if (_viewControl.SelectionSet == null)
+            using OdTvSelectionSetIterator it = sSet.getIterator();
+            while (!it.done())
             {
-                _viewControl.SelectionSet = sSet;
-                Highlight(_viewControl.SelectionSet, true);
-                return;
+                OdTvEntityId entity_id = it.getEntity();
+                if (isPointMode)
+                {
+                    if (_viewControl.SelectionSet.isMember(entity_id))
+                        _viewControl.SelectionSet.removeEntity(entity_id);
+                    else
+                        _viewControl.SelectionSet.appendEntity(entity_id);
+
+                    if (_viewControl.SelectionSet.numItems() == 0)
+                    {
+                        _viewControl.SelectionSet = null;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (!_viewControl.SelectionSet.isMember(entity_id))
+                        _viewControl.SelectionSet.appendEntity(entity_id);
+                }
+                it.step();
             }
+            sSet.Dispose();
         }
+
+        if (_viewControl.SelectionSet is not null)
+            Highlight(_viewControl.SelectionSet, true);
     }
 
     private void Highlight(OdTvSelectionSet sSet, bool bDoIt)
     {
         if (sSet == null)
             return;
-        OdTvSelectionSetIterator pIter = sSet.getIterator();
+
+        OdTvSelectionSetIterator? pIter = sSet.getIterator();
         for (; pIter != null && !pIter.done(); pIter.step())
             Highlight(pIter, bDoIt);
-
-        if (ObjectSelected != null)
-        {
-            if (sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kPoint)
-                ObjectSelected?.Invoke(sSet, _modelId);
-            else
-                ObjectsSelected?.Invoke(sSet, _modelId);
-        }
     }
 
     private void Highlight(OdTvSelectionSetIterator pIter, bool bDoIt)
     {
+        using MemoryManagerScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId.IsNull())
             return;

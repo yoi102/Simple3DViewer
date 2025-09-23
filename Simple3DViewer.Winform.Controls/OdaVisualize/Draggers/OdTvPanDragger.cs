@@ -18,6 +18,7 @@ internal class OdTvPanDragger : OdTvDragger
         : base(tvDeviceId, tvDraggersModelId, viewControl)
     {
         _panCursor = Cursors.Hand;
+        NeedFreeDrag = true;
     }
 
     public override DraggerResult NextPoint(int x, int y)

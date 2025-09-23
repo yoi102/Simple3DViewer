@@ -33,7 +33,8 @@ public enum RenderMode
 
 public class OdaVisualizeControl : Control
 {
-    public OdTvSelectionSet? SelectionSet = null;
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal OdTvSelectionSet? SelectionSet { get; set; } = null;
     private readonly Dictionary<ulong, OdTvExtendedView> _extendedViewDict = [];
     private OdTvAnimation? _animation = null;
     private OdTvDragger? _dragger = null;
@@ -187,6 +188,8 @@ public class OdaVisualizeControl : Control
             OdTvFactoryId factId = TV_Visualize_Globals.odTvGetFactory();
             factId.removeDatabase(odaVisualizeContext.TvDatabaseId);
         }
+        SelectionSet?.Dispose();
+        SelectionSet = null;
         odaVisualizeContext = null;
         TvDeviceId = null;
         _tvDraggersModelId = null;
@@ -533,7 +536,7 @@ public class OdaVisualizeControl : Control
 
     private void KeyPressEvent(object? sender, KeyPressEventArgs e)
     {
-        if ((int)e.KeyChar == (int)Keys.Escape)
+        if ((int)e.KeyChar != (int)Keys.Escape)
             return;
         ClearSelectionSet();
     }
@@ -560,21 +563,21 @@ public class OdaVisualizeControl : Control
         if (e.Button == MouseButtons.Left)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, LeftButtonDragger);
-            _dragger = newDragger;
+            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Middle)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, MiddleButtonDragger);
-            _dragger = newDragger;
+            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Right)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, RightButtonDragger);
-            _dragger = newDragger;
+            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
@@ -595,7 +598,7 @@ public class OdaVisualizeControl : Control
             extView.viewCubeProcessHover(e.X, e.Y);
         }
 
-        if (_dragger is not null)
+        if (_dragger is not null && _dragger.NeedFreeDrag)
         {
             DraggerResult res = _dragger.Drag(e.X, e.Y);
             ActionAferDragger(res);

@@ -20,6 +20,7 @@ internal class OdTvOrbitDragger : OdTvDragger
         : base(tvDeviceId, tvDraggersModelId, viewControl)
     {
         _orbitCursor = Cursors.Arrow;
+        NeedFreeDrag = true;
     }
 
     private struct OdTvViewportParams
