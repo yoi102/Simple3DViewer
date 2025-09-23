@@ -255,7 +255,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void UpdateFrame(bool bCreate, int x, int y)
     {
-        using MemoryManagerScope _ = new MemoryManagerScope();
+        using MemoryManagerScope _ = new();
 
         OdGePoint3d[] pts = new OdGePoint3d[5];
 
@@ -384,11 +384,7 @@ internal class OdTvSelectDragger : OdTvDragger
                     else
                         _viewControl.SelectionSet.appendEntity(entity_id);
 
-                    if (_viewControl.SelectionSet.numItems() == 0)
-                    {
-                        _viewControl.SelectionSet = null;
-                        break;
-                    }
+             
                 }
                 else
                 {
@@ -399,7 +395,11 @@ internal class OdTvSelectDragger : OdTvDragger
             }
             sSet.Dispose();
         }
-
+        if (_viewControl.SelectionSet.numItems() == 0)
+        {
+            _viewControl.SelectionSet = null;
+            return;
+        }
         if (_viewControl.SelectionSet is not null)
             Highlight(_viewControl.SelectionSet, true);
     }

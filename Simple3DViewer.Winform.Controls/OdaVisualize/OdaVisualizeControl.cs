@@ -424,6 +424,8 @@ public class OdaVisualizeControl : Control
 
     private OdTvDragger? GetOrCreateOdTvDragger(OdTvDragger? dragger, DraggerType draggerType)
     {
+        FinishDragger();
+
         if (IsDraggerOfType(dragger, draggerType))
             return dragger;
         return GetOdTvDragger(draggerType);
@@ -563,21 +565,18 @@ public class OdaVisualizeControl : Control
         if (e.Button == MouseButtons.Left)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, LeftButtonDragger);
-            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Middle)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, MiddleButtonDragger);
-            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Right)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, RightButtonDragger);
-            _dragger = _dragger == newDragger ? null : newDragger;
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
@@ -792,7 +791,7 @@ public class OdaVisualizeControl : Control
     {
         DraggerResult res = DraggerResult.NothingToDo;
 
-        if (_dragger == null)
+        if (_dragger == null || _dragger == dragger)
             res = dragger.Start(null, Cursor);
         else
         {
@@ -806,7 +805,7 @@ public class OdaVisualizeControl : Control
                     pPrevDragger = _dragger.Finish(out res_prev);
                 ActionAferDragger(res_prev);
             }
-            res = dragger.Start(prevDragger: pPrevDragger, Cursor);
+            res = dragger.Start(pPrevDragger, Cursor);
         }
         // need update active dragger before calling action
         _dragger = dragger;
