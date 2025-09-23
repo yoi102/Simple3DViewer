@@ -329,7 +329,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
             if (bCrossing)
             {
-                _entityId.openObject(OdTv_OpenMode.kForWrite).setColor(new OdTvColorDef(0, 255, 0));
+                _entityId.openObject(OdTv_OpenMode.kForWrite).setColor(new OdTvColorDef(247, 135, 135));
                 _entityId.openObject(OdTv_OpenMode.kForWrite).setLinetypeScale(0.03);
                 _frameIdContourId.openObject().setLinetype(new OdTvLinetypeDef(_frameLinetypeId));
             }
@@ -358,50 +358,101 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void Merge(OdTvSelectionSet sSet)
     {
-        if (sSet == null)
-            return;
+        if (sSet == null) return;
 
-        bool isPointMode = sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kPoint;
-        //remove highlight from previous selection set
+        bool pointMode = sSet.getOptions().getMode() == OdTvSelectionOptions_Mode.kPoint;
+        bool ctrlDown = IsKeyDown(Keys.ControlKey);
+
+        // 先去掉旧高亮，避免闪烁/残留
         if (_viewControl.SelectionSet is not null)
             Highlight(_viewControl.SelectionSet, false);
 
-        if (_viewControl.SelectionSet is null || !IsKeyDown(Keys.ControlKey))
+        // 当前为空：直接采用新集合
+        if (_viewControl.SelectionSet is null)
         {
-            _viewControl.SelectionSet?.Dispose();
-            _viewControl.SelectionSet = sSet;
-        }
-        else
-        {
-            using OdTvSelectionSetIterator it = sSet.getIterator();
-            while (!it.done())
-            {
-                OdTvEntityId entity_id = it.getEntity();
-                if (isPointMode)
-                {
-                    if (_viewControl.SelectionSet.isMember(entity_id))
-                        _viewControl.SelectionSet.removeEntity(entity_id);
-                    else
-                        _viewControl.SelectionSet.appendEntity(entity_id);
-
-             
-                }
-                else
-                {
-                    if (!_viewControl.SelectionSet.isMember(entity_id))
-                        _viewControl.SelectionSet.appendEntity(entity_id);
-                }
-                it.step();
-            }
-            sSet.Dispose();
-        }
-        if (_viewControl.SelectionSet.numItems() == 0)
-        {
-            _viewControl.SelectionSet = null;
+            AdoptSelection(sSet);
             return;
         }
-        if (_viewControl.SelectionSet is not null)
-            Highlight(_viewControl.SelectionSet, true);
+
+        // Ctrl：做“对称差”式的取反合并（toggle）
+        if (ctrlDown)
+        {
+            ToggleIntoCurrent(_viewControl.SelectionSet, sSet);
+            sSet.Dispose(); // toggle完毕，sSet不再需要
+            FinalizeHighlightOrClear();
+            return;
+        }
+
+        // 非 Ctrl：点击/框选替换逻辑
+        if (pointMode && IsSameSingleEntity(_viewControl.SelectionSet, sSet))
+        {
+            // 点中同一个实体 → 取消选择
+            _viewControl.SelectionSet.Dispose();
+            _viewControl.SelectionSet = null;
+            sSet.Dispose();
+            return;
+        }
+
+        // 直接替换为新集合
+        ReplaceSelection(sSet);
+        FinalizeHighlightOrClear();
+
+        // ---------- 内部小工具 ----------
+        void AdoptSelection(OdTvSelectionSet newSet)
+        {
+            _viewControl.SelectionSet = newSet;
+            if (_viewControl.SelectionSet.numItems() > 0)
+                Highlight(_viewControl.SelectionSet, true);
+            else
+                ClearSelection();
+        }
+
+        void ReplaceSelection(OdTvSelectionSet newSet)
+        {
+            _viewControl.SelectionSet?.Dispose();
+            _viewControl.SelectionSet = newSet;
+        }
+
+        void ClearSelection()
+        {
+            _viewControl.SelectionSet?.Dispose();
+            _viewControl.SelectionSet = null;
+        }
+
+        void FinalizeHighlightOrClear()
+        {
+            if (_viewControl.SelectionSet is null) return;
+            if (_viewControl.SelectionSet.numItems() == 0)
+            {
+                ClearSelection();
+            }
+            else
+            {
+                Highlight(_viewControl.SelectionSet, true);
+            }
+        }
+
+        static void ToggleIntoCurrent(OdTvSelectionSet current, OdTvSelectionSet incoming)
+        {
+            using var it = incoming.getIterator();
+            while (!it.done())
+            {
+                OdTvEntityId id = it.getEntity();
+                if (current.isMember(id))
+                    current.removeEntity(id);
+                else
+                    current.appendEntity(id);
+                it.step();
+            }
+        }
+
+        static bool IsSameSingleEntity(OdTvSelectionSet a, OdTvSelectionSet b)
+        {
+            if (a.numItems() != 1 || b.numItems() != 1) return false;
+            using var ita = a.getIterator();
+            using var itb = b.getIterator();
+            return ita.getEntity().IsEqual(itb.getEntity());
+        }
     }
 
     private void Highlight(OdTvSelectionSet sSet, bool bDoIt)
