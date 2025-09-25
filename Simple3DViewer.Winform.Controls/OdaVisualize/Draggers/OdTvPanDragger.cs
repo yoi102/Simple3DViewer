@@ -25,7 +25,7 @@ internal class OdTvPanDragger : OdTvDragger
     {
         if (State == DraggerState.Waiting)
             return DraggerResult.NothingToDo;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId == null || viewId.isNull())
             return DraggerResult.NothingToDo;
@@ -50,7 +50,7 @@ internal class OdTvPanDragger : OdTvDragger
         // obtain delta for dolly
         OdGeVector3d delta = (_prevPt - (pt - _pos)).asVector();
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId == null || viewId.isNull())
             return DraggerResult.NothingToDo;

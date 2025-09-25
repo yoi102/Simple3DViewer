@@ -33,17 +33,26 @@ public enum RenderMode
 
 public class OdaVisualizeControl : Control
 {
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    internal OdTvSelectionSet? SelectionSet { get; set; } = null;
+    private readonly Dictionary<DraggerType, OdTvDragger> _draggerCache = [];
+
     private readonly Dictionary<ulong, OdTvExtendedView> _extendedViewDict = [];
+
     private OdTvAnimation? _animation = null;
+
     private OdTvDragger? _dragger = null;
+
     private DraggerType _leftButtonDragger = DraggerType.Select;
+
     private DraggerType _middleButtonDragger = DraggerType.Pan;
+
     private RenderMode _renderMode = RenderMode.kNone;
+
     private DraggerType _rightButtonDragger = DraggerType.Orbit;
+
     private bool _showFPS = true;
+
     private bool _showViewCube = true;
+
     private bool _showWCS = true;
 
     private OdTvModelId? _tvDraggersModelId = null;
@@ -68,6 +77,7 @@ public class OdaVisualizeControl : Control
     public event EventHandler? RenderModeChanged;
 
     public OdTvModelId? _tvActiveModelId { get; private set; }
+
     public OdTvRegAppId? AppTvId { get; private set; }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -173,9 +183,11 @@ public class OdaVisualizeControl : Control
         }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal OdTvSelectionSet? SelectionSet { get; set; } = null;
     public void ClearDevices()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         foreach (KeyValuePair<ulong, OdTvExtendedView> extView in _extendedViewDict)
         {
@@ -201,7 +213,7 @@ public class OdaVisualizeControl : Control
         if (TvDeviceId.IsNull())
             return null;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvExtendedView? exView = null;
 
         OdTvGsViewId viewId = TvDeviceId.openObject().getActiveView();
@@ -240,7 +252,7 @@ public class OdaVisualizeControl : Control
         if (_tvActiveModelId.IsNull())
             return extents;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvModel pModel = _tvActiveModelId.openObject();
 
@@ -270,7 +282,7 @@ public class OdaVisualizeControl : Control
         if (exView == null)
             return;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvGsView view = exView.getViewId().openObject();
         if (view != null)
@@ -316,7 +328,7 @@ public class OdaVisualizeControl : Control
 
     internal OdTvGsViewId? GetActiveTvViewId()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = TvDeviceId?.openObject()?.getActiveView();
         return viewId;
     }
@@ -343,7 +355,7 @@ public class OdaVisualizeControl : Control
 
         if ((res & DraggerResult.NeedUpdateView) != 0)
         {
-            using MemoryManagerScope _ = new();
+            using MemoryTransactionScope _ = new();
             OdTvGsDevice? pDevice = TvDeviceId?.openObject();
             pDevice?.update();
         }
@@ -359,7 +371,7 @@ public class OdaVisualizeControl : Control
         if (odaVisualizeContext.TvDatabaseId is null)
             return null;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsDeviceId? newDevId = null;
 
         IntPtr wndHndl = new(Handle.ToInt32());
@@ -369,9 +381,6 @@ public class OdaVisualizeControl : Control
         OdTvGsDevice pDevice = newDevId.openObject(OdTv_OpenMode.kForWrite);
         if (pDevice == null)
             return null;
-
-        //                 bool val;
-        //                 pDevice.getOption(OdTvGsDevice_Options.kUseVisualStyles, out val);
 
         // Create view
         OdTvGsViewId newViewId = pDevice.createView("TV_View");
@@ -399,10 +408,10 @@ public class OdaVisualizeControl : Control
         return newDevId;
     }
 
-    private OdTvDragger? GetOdTvDragger(DraggerType draggerType)
+    private OdTvDragger GetOdTvDragger(DraggerType draggerType)
     {
         if (TvDeviceId.IsNull() || _tvDraggersModelId.IsNull() || _tvActiveModelId.IsNull())
-            return null;
+            throw new InvalidOperationException("Device or models are not initialized");
         switch (draggerType)
         {
             case DraggerType.Orbit:
@@ -418,17 +427,22 @@ public class OdaVisualizeControl : Control
                 return new Draggers.OdTvSelectDragger(this, _tvActiveModelId, TvDeviceId, _tvDraggersModelId);
 
             default:
-                return null;
+                throw new NotSupportedException($"Dragger type {draggerType} is not supported");
         }
     }
 
-    private OdTvDragger? GetOrCreateOdTvDragger(OdTvDragger? dragger, DraggerType draggerType)
+    private OdTvDragger GetOrCreateOdTvDragger(DraggerType draggerType)
     {
         FinishDragger();
 
-        if (IsDraggerOfType(dragger, draggerType))
-            return dragger;
-        return GetOdTvDragger(draggerType);
+        if (_draggerCache.TryGetValue(draggerType, out OdTvDragger? odTvDragger))
+        {
+            return odTvDragger;
+        }
+
+        OdTvDragger newDragger = GetOdTvDragger(draggerType);
+        _draggerCache[draggerType] = newDragger;
+        return newDragger;
     }
 
     private void Init()
@@ -438,7 +452,7 @@ public class OdaVisualizeControl : Control
 
         if (odaVisualizeContext.TvDatabaseId == null || TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvDatabase pDb = odaVisualizeContext.TvDatabaseId.openObject(OdTv_OpenMode.kForWrite);
         _tvDraggersModelId = pDb.createModel("Draggers", OdTvModel_Type.kDirect, false);
@@ -453,7 +467,7 @@ public class OdaVisualizeControl : Control
         tvDevice.setOption(OdTvGsDevice_Options.kAntiAliasLevel, 1d);
         tvDevice.setOption(OdTvGsDevice_Options.kAntiAliasLevelExt, 0.25d);
         tvDevice.setOption(OdTvGsDevice_Options.kFXAAEnable, true);
-        var renderMode = (RenderMode)(int)view.mode();
+        RenderMode renderMode = (RenderMode)(int)view.mode();
         if (_renderMode != renderMode)
         {
             _renderMode = renderMode;
@@ -475,7 +489,7 @@ public class OdaVisualizeControl : Control
             return;
 
         this.Cursor = Cursors.WaitCursor;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         using DisposableAction __ = new(() => this.Cursor = Cursors.Default);
 
         OdTvDatabase? pDb = odaVisualizeContext.TvDatabaseId.openObject(OdTv_OpenMode.kForWrite);
@@ -518,24 +532,6 @@ public class OdaVisualizeControl : Control
         Init();
     }
 
-    private bool IsDraggerOfType(OdTvDragger? dragger, DraggerType draggerType)
-    {
-        switch (draggerType)
-        {
-            case DraggerType.Orbit:
-                return dragger is OdTvOrbitDragger;
-
-            case DraggerType.Pan:
-                return dragger is OdTvPanDragger;
-
-            case DraggerType.Select:
-                return dragger is OdTvSelectDragger;
-
-            default:
-                return false;
-        }
-    }
-
     private void KeyPressEvent(object? sender, KeyPressEventArgs e)
     {
         if ((int)e.KeyChar != (int)Keys.Escape)
@@ -564,19 +560,19 @@ public class OdaVisualizeControl : Control
 
         if (e.Button == MouseButtons.Left)
         {
-            OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, LeftButtonDragger);
+            OdTvDragger? newDragger = GetOrCreateOdTvDragger(LeftButtonDragger);
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Middle)
         {
-            OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, MiddleButtonDragger);
+            OdTvDragger? newDragger = GetOrCreateOdTvDragger(MiddleButtonDragger);
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Right)
         {
-            OdTvDragger? newDragger = GetOrCreateOdTvDragger(_dragger, RightButtonDragger);
+            OdTvDragger? newDragger = GetOrCreateOdTvDragger(RightButtonDragger);
             if (newDragger is not null)
                 StartDragger(newDragger, true);
         }
@@ -591,7 +587,7 @@ public class OdaVisualizeControl : Control
 
     private void MouseMoveEvent(object? sender, MouseEventArgs e)
     {
-        var extView = GetActiveTvExtendedView();
+        OdTvExtendedView? extView = GetActiveTvExtendedView();
         if (extView is not null && extView.getEnabledViewCube())
         {
             extView.viewCubeProcessHover(e.X, e.Y);
@@ -620,7 +616,7 @@ public class OdaVisualizeControl : Control
         if (odaVisualizeContext.TvDatabaseId is null || TvDeviceId is null)
             return;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         FinishDragger();
 
@@ -662,7 +658,7 @@ public class OdaVisualizeControl : Control
     {
         if (this.Disposing || TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvGsDevice pDevice = TvDeviceId.openObject();
         pDevice.update();
@@ -689,7 +685,7 @@ public class OdaVisualizeControl : Control
         if (TvDeviceId.IsNull() || this.Disposing)
             return;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsDevice dev = TvDeviceId.openObject(OdTv_OpenMode.kForWrite);
         dev.onSize(new OdTvDCRect(0, this.Width, this.Height, 0));
         dev.update();
@@ -697,7 +693,7 @@ public class OdaVisualizeControl : Control
 
     private void ScreenDolly(int x, int y)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = TvDeviceId?.openObject()?.getActiveView();
         OdTvGsView? pView = viewId?.openObject();
         if (pView == null)
@@ -714,7 +710,7 @@ public class OdaVisualizeControl : Control
     {
         if (TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvExtendedView? exView = GetActiveTvExtendedView();
         exView?.setAnimationEnabled(bEnable);
     }
@@ -723,7 +719,7 @@ public class OdaVisualizeControl : Control
     {
         if (TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsDevice dev = TvDeviceId.openObject(OdTv_OpenMode.kForWrite);
         if (dev.getShowFPS() != bEnable)
         {
@@ -737,7 +733,7 @@ public class OdaVisualizeControl : Control
     {
         if (TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvExtendedView? extView = GetActiveTvExtendedView();
         if (extView != null && extView.getEnabledViewCube() != bEnable)
         {
@@ -750,7 +746,7 @@ public class OdaVisualizeControl : Control
     {
         if (TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvExtendedView? extView = GetActiveTvExtendedView();
         if (extView != null && extView.getEnabledWCS() != bEnable)
         {
@@ -763,7 +759,7 @@ public class OdaVisualizeControl : Control
     {
         if (TvDeviceId.IsNull())
             return;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvExtendedView? exView = GetActiveTvExtendedView();
 

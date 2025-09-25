@@ -38,7 +38,7 @@ internal class DialogService : IDialogService
         if (dialogIdentifier is null)
             throw new InvalidOperationException("DialogHost does not have an identifier.");
 
-        var dialogSession = DialogHost.GetDialogSession(dialogIdentifier);
+        DialogSession? dialogSession = DialogHost.GetDialogSession(dialogIdentifier);
         View.Dialogs.ProgressDialog progressDialog = new(false);
 
         if (dialogSession is not null)

@@ -2,12 +2,12 @@
 
 namespace Simple3DViewer.Shared.Scopes;
 
-public sealed class MemoryManagerScope : IDisposable
+public sealed class MemoryTransactionScope : IDisposable
 {
     private readonly MemoryManager _memoryManager;
     private readonly MemoryTransaction _transactionHandle;
 
-    public MemoryManagerScope()
+    public MemoryTransactionScope()
     {
         _memoryManager = MemoryManager.GetMemoryManager();
         _transactionHandle = _memoryManager.StartTransaction();

@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Simple3DViewer.Winform.Controls;
 
-public class OdaVisualizeContext:IDisposable
+public class OdaVisualizeContext : IDisposable
 {
     [MemberNotNullWhen(true, nameof(TvDatabaseId))]
     [MemberNotNullWhen(true, nameof(DatabaseInfo))]
@@ -27,7 +27,7 @@ public class OdaVisualizeContext:IDisposable
     public bool LoadFile(string filepath)
     {
         IsInitialized = false;
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvFactoryId factId = TV_Visualize_Globals.odTvGetFactory();
         if (TvDatabaseId is not null)

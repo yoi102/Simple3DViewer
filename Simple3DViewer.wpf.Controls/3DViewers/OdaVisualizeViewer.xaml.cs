@@ -16,6 +16,10 @@ public partial class OdaVisualizeViewer : System.Windows.Controls.UserControl
         {
             RenderMode = _visualizeControl.RenderMode;
         };
+        this.GotFocus += (s, e) =>
+          {
+              _visualizeControl.Focus();
+          };
     }
 
     public bool ShowFPS

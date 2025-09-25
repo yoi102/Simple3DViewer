@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Simple3DViewer.Shared.Services;
 using Simple3DViewer.wpf.Services;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Loader;
 using System.Windows;
@@ -17,7 +18,7 @@ namespace Simple3DViewer.wpf
         public App()
         {
             string lang = System.Globalization.CultureInfo.CurrentCulture.Name;
-            var culture = new System.Globalization.CultureInfo(lang);
+            CultureInfo culture = new(lang);
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
             I18NExtension.Culture = culture;
@@ -48,7 +49,7 @@ namespace Simple3DViewer.wpf
         /// </summary>
         private static IServiceProvider ConfigureServices()
         {
-            var services = new ServiceCollection();
+            ServiceCollection services = new();
 
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<IWindowTrackService>(new WindowTrackService());

@@ -18,7 +18,7 @@ public class LocalizedDescriptionAttribute : DescriptionAttribute
     {
         get
         {
-            var description = _resourceManager.GetString(_resourceKey);
+            string? description = _resourceManager.GetString(_resourceKey);
             return string.IsNullOrWhiteSpace(description) ? string.Format("[[{0}]]", _resourceKey) : description;
         }
     }

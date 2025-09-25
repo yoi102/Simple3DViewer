@@ -59,7 +59,6 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private OdTvGeometryDataId? _frameId;
     private OdTvGeometryDataId? _frameIdContourId;
-
     private readonly OdTvSelectionOptions _opt = new();
     private readonly OdTvDCPoint[] _pts = new OdTvDCPoint[2];
 
@@ -68,7 +67,7 @@ internal class OdTvSelectDragger : OdTvDragger
     public OdTvSelectDragger(OdaVisualizeControl viewControl, OdTvModelId modelId, OdTvGsDeviceId tvDeviceId, OdTvModelId tvDraggersModelId)
         : base(tvDeviceId, tvDraggersModelId, viewControl)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         _pts[0] = new();
         _pts[1] = new();
@@ -133,17 +132,14 @@ internal class OdTvSelectDragger : OdTvDragger
 
         if (_state == SelectState.kPoint)
         {
+            _state = SelectState.kWindow;
             EnableTemporaryObjects();
         }
-        _state = SelectState.kWindow;
 
-        using MemoryManagerScope _ = new();
 
         // create temporary geometry if need
-        OdTvEntity? entity = null;
-        if (!_entityId.IsNull())
-            entity = _entityId.openObject(OdTv_OpenMode.kForWrite);
-        UpdateFrame(entity == null, x, y);
+
+        UpdateFrame(x, y);
 
         return DraggerResult.NeedUpdateView;
     }
@@ -219,14 +215,14 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void EnableTemporaryObjects()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         //get device
         OdTvGsDevice dev = TvDeviceId.openObject(OdTv_OpenMode.kForWrite);
         if (dev is null)
             return;
 
         //add temporary view
-        dev.addView(_tempViewId);
+        dev.addView(viewId: _tempViewId);
 
         //get view ptr
         OdTvGsView? view = _tempViewId.openObject(OdTv_OpenMode.kForWrite);
@@ -242,10 +238,11 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void DisableTemporaryObjects()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         //remove view from the device
         OdTvGsDevice dev = TvDeviceId.openObject(OdTv_OpenMode.kForWrite);
         dev.removeView(_tempViewId);
+
         //erase draggers model fromview
         _tempViewId.openObject(OdTv_OpenMode.kForWrite).eraseModel(TvDraggerModelId);
         //remove entities from the temporary model
@@ -253,9 +250,9 @@ internal class OdTvSelectDragger : OdTvDragger
         dev.update();
     }
 
-    private void UpdateFrame(bool bCreate, int x, int y)
+    private void UpdateFrame(int x, int y)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdGePoint3d[] pts = new OdGePoint3d[5];
 
@@ -286,8 +283,12 @@ internal class OdTvSelectDragger : OdTvDragger
         pts[1].transformBy(matr);
         pts[3].transformBy(matr);
 
+        OdTvEntity? entity = null;
+        if (!_entityId.IsNull())
+            entity = _entityId.openObject(OdTv_OpenMode.kForWrite);
+
         //update or create entity
-        if (bCreate)
+        if (entity is null)
         {
             OdTvModel model = TvDraggerModelId.openObject(OdTv_OpenMode.kForWrite);
             _entityId = model.appendEntity();
@@ -329,13 +330,13 @@ internal class OdTvSelectDragger : OdTvDragger
 
             if (bCrossing)
             {
-                _entityId.openObject(OdTv_OpenMode.kForWrite).setColor(new OdTvColorDef(247, 135, 135));
-                _entityId.openObject(OdTv_OpenMode.kForWrite).setLinetypeScale(0.03);
+                entity.setColor(new OdTvColorDef(247, 135, 135));
+                entity.setLinetypeScale(0.03);
                 _frameIdContourId.openObject().setLinetype(new OdTvLinetypeDef(_frameLinetypeId));
             }
             else
             {
-                _entityId.openObject(OdTv_OpenMode.kForWrite).setColor(new OdTvColorDef(0, 0, 255));
+                entity.setColor(new OdTvColorDef(0, 0, 255));
                 _frameIdContourId.openObject().setLinetype(new OdTvLinetypeDef());
             }
         }
@@ -343,7 +344,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private OdGePoint3d ToEyeToWorldLocal(int x, int y)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdGePoint3d wcsPt = new(x, y, 0);
         OdTvGsView view = _tempViewId.openObject();
 
@@ -434,7 +435,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
         static void ToggleIntoCurrent(OdTvSelectionSet current, OdTvSelectionSet incoming)
         {
-            using var it = incoming.getIterator();
+            using OdTvSelectionSetIterator it = incoming.getIterator();
             while (!it.done())
             {
                 OdTvEntityId id = it.getEntity();
@@ -449,8 +450,8 @@ internal class OdTvSelectDragger : OdTvDragger
         static bool IsSameSingleEntity(OdTvSelectionSet a, OdTvSelectionSet b)
         {
             if (a.numItems() != 1 || b.numItems() != 1) return false;
-            using var ita = a.getIterator();
-            using var itb = b.getIterator();
+            using OdTvSelectionSetIterator ita = a.getIterator();
+            using OdTvSelectionSetIterator itb = b.getIterator();
             return ita.getEntity().IsEqual(itb.getEntity());
         }
     }
@@ -467,7 +468,7 @@ internal class OdTvSelectDragger : OdTvDragger
 
     private void Highlight(OdTvSelectionSetIterator pIter, bool bDoIt)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId.IsNull())
             return;

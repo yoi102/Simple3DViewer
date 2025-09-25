@@ -21,7 +21,7 @@ internal class TvWpfViewWCS
     {
         _viewId = tvViewId;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsDevice dev = _viewId.openObject().device().openObject(OdTv_OpenMode.kForWrite);
 
         // add wcs view
@@ -36,7 +36,7 @@ internal class TvWpfViewWCS
 
     public void UpdateWCS()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvGsView view = _viewId.openObject();
 
@@ -82,7 +82,7 @@ internal class TvWpfViewWCS
 
     public bool IsNeedUpdateWCS(OdTvGsView_RenderMode oldmode, OdTvGsView_RenderMode newmode)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsView wcsView = _wcsViewId.openObject(OdTv_OpenMode.kForWrite);
         if (wcsView == null)
         {
@@ -109,7 +109,7 @@ internal class TvWpfViewWCS
 
     private void CreateWcsAxis(OdTvGeometryDataId wcsId, OdTvColorDef color, OdGePoint3d startPoint, OdGePoint3d endPoint, string axisName)
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
 
         OdTvEntity pWcs = wcsId.openAsSubEntity(OdTv_OpenMode.kForWrite);
         pWcs.setColor(color);
@@ -179,7 +179,7 @@ internal class TvWpfViewWCS
 
     public void RemoveWCS()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         // remove old wcs entities
         _tvWcsModelId.openObject(OdTv_OpenMode.kForWrite).clearEntities();
     }

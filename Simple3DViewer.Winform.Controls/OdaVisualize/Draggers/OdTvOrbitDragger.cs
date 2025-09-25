@@ -71,7 +71,7 @@ internal class OdTvOrbitDragger : OdTvDragger
 
         // calculate click point in WCS
         OdGePoint3d pt = ToEyeToWorld(x, y);
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId.IsNull())
             return DraggerResult.NothingToDo;
@@ -101,7 +101,7 @@ internal class OdTvOrbitDragger : OdTvDragger
         if (State == DraggerState.Waiting)
             return DraggerResult.NothingToDo;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId.IsNull())
             return DraggerResult.NothingToDo;

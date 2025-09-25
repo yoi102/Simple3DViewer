@@ -84,7 +84,7 @@ internal abstract class OdTvDragger
     /// </summary>
     public void UpdateBaseColor()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         uint bgColor = TvDeviceId.openObject().getBackgroundColor();
         byte[] bytes = new[] { byte.MaxValue, (byte)(bgColor >> 16), (byte)(bgColor >> 8), (byte)(bgColor >> 0) };
         int newColor = BitConverter.ToInt32(bytes, 0);
@@ -165,7 +165,7 @@ internal abstract class OdTvDragger
             RemoveDraggersModelFromView();
 
             //remove entities from the model
-            using MemoryManagerScope _ = new();
+            using MemoryTransactionScope _ = new();
             OdTvModel model = TvDraggerModelId.openObject(OdTv_OpenMode.kForWrite);
             if (model != null)
                 model.clearEntities();
@@ -256,7 +256,7 @@ internal abstract class OdTvDragger
     /// </summary>
     protected void AddDraggersModelToView()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId != null && !viewId.isNull())
             viewId.openObject(OdTv_OpenMode.kForWrite).addModel(TvDraggerModelId);
@@ -267,7 +267,7 @@ internal abstract class OdTvDragger
     /// </summary>
     protected void RemoveDraggersModelFromView()
     {
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsViewId? viewId = _viewControl.GetActiveTvViewId();
         if (viewId != null && !viewId.isNull())
             viewId.openObject(OdTv_OpenMode.kForWrite).eraseModel(TvDraggerModelId);
@@ -297,7 +297,7 @@ internal abstract class OdTvDragger
         if (viewId == null || viewId.isNull())
             return wcsPt;
 
-        using MemoryManagerScope _ = new();
+        using MemoryTransactionScope _ = new();
         OdTvGsView view = viewId.openObject();
 
         if (view.isPerspective())
