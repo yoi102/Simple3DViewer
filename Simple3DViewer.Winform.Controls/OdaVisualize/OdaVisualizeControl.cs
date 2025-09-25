@@ -6,6 +6,7 @@ using Simple3DViewer.Shared.Scopes;
 using Simple3DViewer.Winform.Controls.OdaVisualize.Draggers;
 using System.ComponentModel;
 using System.Diagnostics;
+
 using OdTvDragger = Simple3DViewer.Winform.Controls.OdaVisualize.Draggers.OdTvDragger;
 
 namespace Simple3DViewer.Winform.Controls.OdaVisualize;
@@ -31,6 +32,15 @@ public enum RenderMode
     kNone = 7
 }
 
+[Flags]
+public enum SelectionOptionsLevel
+{
+    kEntity = 0,
+    kNestedEntity = 1,
+    kGeometry = 2,
+    kSubGeometry = 3
+}
+
 public class OdaVisualizeControl : Control
 {
     private readonly Dictionary<DraggerType, OdTvDragger> _draggerCache = [];
@@ -41,6 +51,8 @@ public class OdaVisualizeControl : Control
 
     private OdTvDragger? _dragger = null;
 
+    private bool _draggerDragged = false;
+
     private DraggerType _leftButtonDragger = DraggerType.Select;
 
     private DraggerType _middleButtonDragger = DraggerType.Pan;
@@ -48,6 +60,8 @@ public class OdaVisualizeControl : Control
     private RenderMode _renderMode = RenderMode.kNone;
 
     private DraggerType _rightButtonDragger = DraggerType.Orbit;
+
+    private SelectionOptionsLevel _selectionOptionsLevel = SelectionOptionsLevel.kEntity;
 
     private bool _showFPS = true;
 
@@ -73,6 +87,8 @@ public class OdaVisualizeControl : Control
         this.MouseMove += MouseMoveEvent;
         this.KeyPress += KeyPressEvent;
     }
+
+    public event EventHandler? MenuOpen;
 
     public event EventHandler? RenderModeChanged;
 
@@ -124,6 +140,21 @@ public class OdaVisualizeControl : Control
     {
         get { return _rightButtonDragger; }
         set { _rightButtonDragger = value; }
+    }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public SelectionOptionsLevel SelectionOptionsLevel
+    {
+        get { return _selectionOptionsLevel; }
+        set
+        {
+            _selectionOptionsLevel = value;
+
+            if (this._draggerCache.TryGetValue(DraggerType.Select, out OdTvDragger? dragger))
+            {
+                ((OdTvSelectDragger)dragger).SetSelectionLevel((OdTvSelectionOptions_Level)(int)_selectionOptionsLevel);
+            }
+        }
     }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -409,7 +440,7 @@ public class OdaVisualizeControl : Control
         return newDevId;
     }
 
-    private OdTvDragger? GetOdTvDragger(DraggerType draggerType)
+    private OdTvDragger? CreateOdTvDragger(DraggerType draggerType)
     {
         if (TvDeviceId.IsNull() || _tvDraggersModelId.IsNull() || _tvActiveModelId.IsNull())
             return null;
@@ -425,7 +456,9 @@ public class OdaVisualizeControl : Control
 
             case DraggerType.Select:
 
-                return new Draggers.OdTvSelectDragger(this, _tvActiveModelId, TvDeviceId, _tvDraggersModelId);
+                OdTvSelectDragger dragger = new(this, _tvActiveModelId, TvDeviceId, _tvDraggersModelId);
+                dragger.SetSelectionLevel((OdTvSelectionOptions_Level)(int)_selectionOptionsLevel);
+                return dragger;
 
             default:
                 return null;
@@ -441,7 +474,7 @@ public class OdaVisualizeControl : Control
             return odTvDragger;
         }
 
-        OdTvDragger? newDragger = GetOdTvDragger(draggerType);
+        OdTvDragger? newDragger = CreateOdTvDragger(draggerType);
         if (newDragger is null)
             return null;
         _draggerCache[draggerType] = newDragger;
@@ -597,15 +630,23 @@ public class OdaVisualizeControl : Control
         {
             DraggerResult res = _dragger.Drag(e.X, e.Y);
             ActionAferDragger(res);
+            _draggerDragged = true;
         }
     }
 
     private void MouseUpEvent(object? sender, MouseEventArgs e)
     {
+        if (e.Button == MouseButtons.Right && !_draggerDragged && _dragger is not OdTvSelectDragger)
+        {
+            MenuOpen?.Invoke(this, EventArgs.Empty);
+        }
         if (_dragger is null)
             return;
         DraggerResult res = _dragger.NextPointUp(e.X, e.Y);
         ActionAferDragger(res);
+
+        _draggerDragged = false;
+        _dragger = null;
         this.Cursor = Cursors.Default;
     }
 

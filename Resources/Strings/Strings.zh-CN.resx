@@ -190,7 +190,7 @@
     <value>二维优化</value>
   </data>
   <data name="kWireframe" xml:space="preserve">
-    <value>ワイヤーフレーム</value>
+    <value>线框</value>
   </data>
   <data name="kHiddenLine" xml:space="preserve">
     <value>隐藏线</value>
@@ -227,5 +227,17 @@
   </data>
   <data name="RightButtonDragger" xml:space="preserve">
     <value>右键拖拽工具</value>
+  </data>
+  <data name="Entity" xml:space="preserve">
+    <value>实体</value>
+  </data>
+  <data name="NestedEntity" xml:space="preserve">
+    <value>嵌套实体</value>
+  </data>
+  <data name="Geometry" xml:space="preserve">
+    <value>几何体</value>
+  </data>
+  <data name="SubGeometry" xml:space="preserve">
+    <value>子几何体</value>
   </data>
 </root>

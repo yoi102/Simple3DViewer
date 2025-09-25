@@ -16,10 +16,14 @@ public partial class OdaVisualizeViewer : System.Windows.Controls.UserControl
         {
             RenderMode = _visualizeControl.RenderMode;
         };
-        this.GotFocus += (s, e) =>
-          {
-              _visualizeControl.Focus();
-          };
+        GotFocus += (s, e) =>
+        {
+            _visualizeControl.Focus();
+        };
+        _visualizeControl.MenuOpen += (s, e) =>
+        {
+            ContextMenu?.IsOpen = true;
+        };
     }
 
     public bool ShowFPS
@@ -171,6 +175,34 @@ public partial class OdaVisualizeViewer : System.Windows.Controls.UserControl
         if (d is OdaVisualizeViewer viewer)
         {
             viewer._visualizeControl.OdaVisualizeContext = odaVisualizeContext;
+        }
+    }
+
+    public SelectionOptionsLevel SelectionOptionsLevel
+    {
+        get { return (SelectionOptionsLevel)GetValue(SelectionOptionsLevelProperty); }
+        set { SetValue(SelectionOptionsLevelProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for SelectionOptionsLevel.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty SelectionOptionsLevelProperty =
+        DependencyProperty.Register(nameof(SelectionOptionsLevel),
+            typeof(SelectionOptionsLevel),
+            typeof(OdaVisualizeViewer),
+            new PropertyMetadata(
+            SelectionOptionsLevel.kEntity,
+            OnSelectionOptionsLevelChanged));
+
+    private static void OnSelectionOptionsLevelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is not SelectionOptionsLevel selectionOptionsLevel)
+        {
+            return;
+        }
+
+        if (d is OdaVisualizeViewer viewer)
+        {
+            viewer._visualizeControl.SelectionOptionsLevel = selectionOptionsLevel;
         }
     }
 }

@@ -190,7 +190,7 @@
     <value>2D最適化</value>
   </data>
   <data name="kWireframe" xml:space="preserve">
-    <value>线框</value>
+    <value>ワイヤーフレーム</value>
   </data>
   <data name="kHiddenLine" xml:space="preserve">
     <value>隠線</value>
@@ -227,5 +227,17 @@
   </data>
   <data name="RightButtonDragger" xml:space="preserve">
     <value>右ボタンドラッガー</value>
+  </data>
+  <data name="Entity" xml:space="preserve">
+    <value>エンティティ</value>
+  </data>
+  <data name="NestedEntity" xml:space="preserve">
+    <value>ネストされたエンティティ</value>
+  </data>
+  <data name="Geometry" xml:space="preserve">
+    <value>ジオメトリ</value>
+  </data>
+  <data name="SubGeometry" xml:space="preserve">
+    <value>サブジオメトリ</value>
   </data>
 </root>

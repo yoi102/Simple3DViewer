@@ -265,4 +265,20 @@
     <value>RightButtonDragger</value>
     <comment>RightButtonDragger</comment>
   </data>
+  <data name="Entity" xml:space="preserve">
+    <value>Entity</value>
+    <comment>Entity</comment>
+  </data>
+  <data name="NestedEntity" xml:space="preserve">
+    <value>NestedEntity</value>
+    <comment>NestedEntity</comment>
+  </data>
+  <data name="Geometry" xml:space="preserve">
+    <value>Geometry</value>
+    <comment>Geometry</comment>
+  </data>
+  <data name="SubGeometry" xml:space="preserve">
+    <value>SubGeometry</value>
+    <comment>SubGeometry</comment>
+  </data>
 </root>

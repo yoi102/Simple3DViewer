@@ -10,7 +10,9 @@
                  xmlns:r="clr-namespace:Resources;assembly=Resources"
                  xmlns:cv="clr-namespace:Simple3DViewer.wpf.Converters"
                  xmlns:ex="clr-namespace:Simple3DViewer.wpf.Extensions"
+                 xmlns:misc="clr-namespace:Simple3DViewer.wpf.Misc"
                  xmlns:ov="clr-namespace:Simple3DViewer.Winform.Controls.OdaVisualize;assembly=Simple3DViewer.Winform.Controls"
+                 xmlns:enums="clr-namespace:Simple3DViewer.wpf.Enums"
                  d:DataContext="{d:DesignInstance Type=local:MainWindowViewModel}"
                  mc:Ignorable="d"
                  Title="{I18N {x:Static r:LangKeys.Simple3DViewer}}"
@@ -21,13 +23,17 @@
                  Height="1000"
                  Width="1500">
     <mah:MetroWindow.Resources>
+        <misc:BindingProxy x:Key="Proxy"
+                           DataContext="{Binding}" />
         <cv:EnumToEnumConverter x:Key="ToRenderMode"
                                 TargetEnumType="{x:Type ov:RenderMode}"
-                                SourceEnumType="{x:Type local:ViewerRenderMode}" />
+                                SourceEnumType="{x:Type enums:ViewerRenderMode}" />
         <cv:EnumToEnumConverter x:Key="ToDraggerType"
                                 TargetEnumType="{x:Type ov:DraggerType}"
-                                SourceEnumType="{x:Type local:ViewerDraggerType}" />
-
+                                SourceEnumType="{x:Type enums:ViewerDraggerType}" />
+        <cv:EnumToEnumConverter x:Key="ToSelectionOptionsLevel"
+                                TargetEnumType="{x:Type ov:SelectionOptionsLevel}"
+                                SourceEnumType="{x:Type enums:ViewerSelectionOptionsLevel}" />
     </mah:MetroWindow.Resources>
     <mah:MetroWindow.LeftWindowCommands>
         <mah:WindowCommands>
@@ -116,28 +122,28 @@
                         <Label FontWeight="Bold"
                                Content="{I18N {x:Static r:LangKeys.RenderMode}}" />
                         <ComboBox SelectedItem="{Binding RenderMode}"
-                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerRenderMode}}}" />
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type enums:ViewerRenderMode}}}" />
                     </StackPanel>
                     <StackPanel Margin="0 10 0 0"
                                 Orientation="Vertical">
                         <Label FontWeight="Bold"
                                Content="{I18N {x:Static r:LangKeys.LeftButtonDragger}}" />
                         <ComboBox SelectedItem="{Binding LeftButtonDragger}"
-                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type enums:ViewerDraggerType}}}" />
                     </StackPanel>
                     <StackPanel Margin="0 10 0 0"
                                 Orientation="Vertical">
                         <Label FontWeight="Bold"
                                Content="{I18N {x:Static r:LangKeys.MiddleButtonDragger}}" />
                         <ComboBox SelectedItem="{Binding MiddleButtonDragger}"
-                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type enums:ViewerDraggerType}}}" />
                     </StackPanel>
                     <StackPanel Margin="0 10 0 0"
                                 Orientation="Vertical">
                         <Label FontWeight="Bold"
                                Content="{I18N {x:Static r:LangKeys.RightButtonDragger}}" />
                         <ComboBox SelectedItem="{Binding RightButtonDragger}"
-                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type local:ViewerDraggerType}}}" />
+                                  ItemsSource="{Binding Source={ex:EnumBindingSource {x:Type enums:ViewerDraggerType}}}" />
                     </StackPanel>
                 </StackPanel>
             </Grid>
@@ -152,7 +158,25 @@
                                        RenderMode="{Binding RenderMode,Converter={StaticResource ToRenderMode}}"
                                        LeftButtonDragger="{Binding LeftButtonDragger ,Converter={StaticResource ToDraggerType}}"
                                        MiddleButtonDragger="{Binding MiddleButtonDragger,Converter={StaticResource ToDraggerType}}"
-                                       RightButtonDragger="{Binding RightButtonDragger,Converter={StaticResource ToDraggerType}}" />
+                                       RightButtonDragger="{Binding RightButtonDragger,Converter={StaticResource ToDraggerType}}"
+                                       SelectionOptionsLevel="{Binding SelectedLevel,Converter={StaticResource ToSelectionOptionsLevel}}">
+                    <yr:OdaVisualizeViewer.ContextMenu>
+                        <ContextMenu  ItemsSource="{Binding DataContext.Levels,Source={StaticResource Proxy}}">
+                            <ContextMenu.ItemContainerStyle>
+                                <Style TargetType="MenuItem"
+                                       BasedOn="{StaticResource MaterialDesignMenuItem}">
+                                    <Setter Property="Header"
+                                            Value="{Binding Display}" />
+                                    <Setter Property="IsCheckable"
+                                            Value="True" />
+                                    <Setter Property="IsChecked"
+                                            Value="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                           
+                                </Style>
+                            </ContextMenu.ItemContainerStyle>
+                        </ContextMenu>
+                    </yr:OdaVisualizeViewer.ContextMenu>
+                </yr:OdaVisualizeViewer>
             </Grid>
         </Grid>
     </md:DialogHost>

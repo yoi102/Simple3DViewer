@@ -124,11 +124,29 @@ namespace Resources.Strings {
         }
         
         /// <summary>
+        ///   查找类似 Entity 的本地化字符串。
+        /// </summary>
+        public static string Entity {
+            get {
+                return ResourceManager.GetString("Entity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Fit 的本地化字符串。
         /// </summary>
         public static string Fit {
             get {
                 return ResourceManager.GetString("Fit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 Geometry 的本地化字符串。
+        /// </summary>
+        public static string Geometry {
+            get {
+                return ResourceManager.GetString("Geometry", resourceCulture);
             }
         }
         
@@ -219,6 +237,15 @@ namespace Resources.Strings {
         public static string MiddleButtonDragger {
             get {
                 return ResourceManager.GetString("MiddleButtonDragger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 NestedEntity 的本地化字符串。
+        /// </summary>
+        public static string NestedEntity {
+            get {
+                return ResourceManager.GetString("NestedEntity", resourceCulture);
             }
         }
         
@@ -363,6 +390,15 @@ namespace Resources.Strings {
         public static string Source {
             get {
                 return ResourceManager.GetString("Source", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查找类似 SubGeometry 的本地化字符串。
+        /// </summary>
+        public static string SubGeometry {
+            get {
+                return ResourceManager.GetString("SubGeometry", resourceCulture);
             }
         }
         

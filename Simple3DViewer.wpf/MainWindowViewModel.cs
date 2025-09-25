@@ -3,56 +3,49 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using Resources.Strings;
 using Simple3DViewer.Winform.Controls;
-using Simple3DViewer.wpf.Attribute;
-using Simple3DViewer.wpf.Converters;
+using Simple3DViewer.wpf.Enums;
 using Simple3DViewer.wpf.Services;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Simple3DViewer.wpf;
 
-[TypeConverter(typeof(EnumDescriptionTypeConverter))]
-public enum ViewerDraggerType
+internal class LevelOption : ObservableObject
 {
-    [LocalizedDescription(nameof(Strings.None), typeof(Strings))]
-    None,
+    private readonly MainWindowViewModel _owner;
+    public ViewerSelectionOptionsLevel Level { get; }
 
-    [LocalizedDescription(nameof(Strings.Orbit), typeof(Strings))]
-    Orbit,
+    public string Display
+    {
+        get
+        {
+            string? value_str = Level.ToString();
+            if (string.IsNullOrEmpty(value_str))
+                return string.Empty;
+            FieldInfo? fi = Level.GetType().GetField(value_str);
+            if (fi != null)
+            {
+                DescriptionAttribute[] attributes = (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                return ((attributes.Length > 0) && (!String.IsNullOrEmpty(attributes[0].Description))) ? attributes[0].Description : Level.ToString();
+            }
+            else
+            {
+                throw new InvalidEnumArgumentException();
+            }
+        }
+    }
 
-    [LocalizedDescription(nameof(Strings.Pan), typeof(Strings))]
-    Pan,
+    public bool IsChecked
+    {
+        get => _owner.SelectedLevel == Level;
+        set { if (value) _owner.SelectedLevel = Level; } // 只有勾选为 true 时写回
+    }
 
-    [LocalizedDescription(nameof(Strings.Select), typeof(Strings))]
-    Select
-}
+    public LevelOption(MainWindowViewModel owner, ViewerSelectionOptionsLevel level)
+    { _owner = owner; Level = level; }
 
-[Flags]
-[TypeConverter(typeof(EnumDescriptionTypeConverter))]
-public enum ViewerRenderMode
-{
-    [LocalizedDescription(nameof(Strings.k2DOptimized), typeof(Strings))]
-    k2DOptimized = 0,
-
-    [LocalizedDescription(nameof(Strings.kWireframe), typeof(Strings))]
-    kWireframe = 1,
-
-    [LocalizedDescription(nameof(Strings.kHiddenLine), typeof(Strings))]
-    kHiddenLine = 2,
-
-    [LocalizedDescription(nameof(Strings.kFlatShaded), typeof(Strings))]
-    kFlatShaded = 3,
-
-    [LocalizedDescription(nameof(Strings.kGouraudShaded), typeof(Strings))]
-    kGouraudShaded = 4,
-
-    [LocalizedDescription(nameof(Strings.kFlatShadedWithWireframe), typeof(Strings))]
-    kFlatShadedWithWireframe = 5,
-
-    [LocalizedDescription(nameof(Strings.kGouraudShadedWithWireframe), typeof(Strings))]
-    kGouraudShadedWithWireframe = 6,
-
-    [LocalizedDescription(nameof(Strings.None), typeof(Strings))]
-    kNone = 7
+    public void Refresh() => OnPropertyChanged(nameof(IsChecked));
 }
 
 internal partial class MainWindowViewModel : ObservableObject
@@ -81,6 +74,21 @@ internal partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private ViewerRenderMode renderMode = ViewerRenderMode.kNone;
 
+    private ViewerSelectionOptionsLevel _selectedLevel = ViewerSelectionOptionsLevel.Entity;
+
+    public ViewerSelectionOptionsLevel SelectedLevel
+    {
+        get => _selectedLevel;
+        set
+        {
+            if (_selectedLevel == value) return;
+            _selectedLevel = value;
+            OnPropertyChanged();
+            // 让所有项更新勾选状态
+            foreach (LevelOption o in Levels) o.Refresh();
+        }
+    }
+
     [ObservableProperty]
     private ViewerDraggerType rightButtonDragger = ViewerDraggerType.Orbit;
 
@@ -93,11 +101,18 @@ internal partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private bool showWCS = true;
 
+    public ObservableCollection<LevelOption> Levels { get; }
+
     public MainWindowViewModel(IThemeSettingService themeSettingService, ICultureSettingService cultureSettingService, IDialogService dialogService)
     {
         this.themeSettingService = themeSettingService;
         this.cultureSettingService = cultureSettingService;
         this.dialogService = dialogService;
+        Levels = new ObservableCollection<LevelOption>(
+           Enum.GetValues(typeof(ViewerSelectionOptionsLevel))
+               .Cast<ViewerSelectionOptionsLevel>()
+               .Select(l => new LevelOption(this, l))
+       );
     }
 
     public bool IsDarkTheme
@@ -171,7 +186,6 @@ internal partial class MainWindowViewModel : ObservableObject
     //{
     //    #region Test
 
-
     //    //string[] paths = [
     //    //                   "C:\\Users\\yoiri\\Downloads\\45214-2X02.stp",
     //    //                           "C:\\Users\\yoiri\\Downloads\\TPS48111LQDGXRQ1.STEP",
@@ -197,13 +211,6 @@ internal partial class MainWindowViewModel : ObservableObject
     //    //    }
     //    //});
     //    #endregion
-
-
-
-
-
-
-
 
     //    var dlg = new OpenFileDialog
     //    {
