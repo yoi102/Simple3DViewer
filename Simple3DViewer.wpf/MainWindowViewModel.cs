@@ -113,6 +113,9 @@ internal partial class MainWindowViewModel : ObservableObject
                .Cast<ViewerSelectionOptionsLevel>()
                .Select(l => new LevelOption(this, l))
        );
+
+        CurrentCultureLCID = System.Globalization.CultureInfo.CurrentCulture.LCID;
+        IsDarkTheme = themeSettingService.IsDarkTheme;
     }
 
     public bool IsDarkTheme

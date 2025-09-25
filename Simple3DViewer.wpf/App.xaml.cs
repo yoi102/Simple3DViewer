@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Simple3DViewer.Shared.Services;
+using Simple3DViewer.wpf.Properties;
 using Simple3DViewer.wpf.Services;
 using System.Globalization;
 using System.IO;
@@ -17,7 +18,12 @@ namespace Simple3DViewer.wpf
 
         public App()
         {
-            string lang = System.Globalization.CultureInfo.CurrentCulture.Name;
+            string lang = Settings.Default.lang;
+            if (string.IsNullOrEmpty(lang))
+            {
+                lang = System.Globalization.CultureInfo.CurrentCulture.Name;
+            }
+
             CultureInfo culture = new(lang);
             Thread.CurrentThread.CurrentCulture = culture;
             Thread.CurrentThread.CurrentUICulture = culture;
@@ -35,6 +41,17 @@ namespace Simple3DViewer.wpf
             };
 
             OdaService.Initialize();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            string lang = System.Globalization.CultureInfo.CurrentCulture.Name;
+            if (lang != Settings.Default.lang)
+            {
+                Settings.Default.lang = lang;
+                Settings.Default.Save();
+            }
+            base.OnExit(e);
         }
 
         public IServiceProvider Services { get; }
