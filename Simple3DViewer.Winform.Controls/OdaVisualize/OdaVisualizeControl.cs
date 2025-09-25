@@ -185,6 +185,7 @@ public class OdaVisualizeControl : Control
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     internal OdTvSelectionSet? SelectionSet { get; set; } = null;
+
     public void ClearDevices()
     {
         using MemoryTransactionScope _ = new();
@@ -408,10 +409,10 @@ public class OdaVisualizeControl : Control
         return newDevId;
     }
 
-    private OdTvDragger GetOdTvDragger(DraggerType draggerType)
+    private OdTvDragger? GetOdTvDragger(DraggerType draggerType)
     {
         if (TvDeviceId.IsNull() || _tvDraggersModelId.IsNull() || _tvActiveModelId.IsNull())
-            throw new InvalidOperationException("Device or models are not initialized");
+            return null;
         switch (draggerType)
         {
             case DraggerType.Orbit:
@@ -427,11 +428,11 @@ public class OdaVisualizeControl : Control
                 return new Draggers.OdTvSelectDragger(this, _tvActiveModelId, TvDeviceId, _tvDraggersModelId);
 
             default:
-                throw new NotSupportedException($"Dragger type {draggerType} is not supported");
+                return null;
         }
     }
 
-    private OdTvDragger GetOrCreateOdTvDragger(DraggerType draggerType)
+    private OdTvDragger? GetOrCreateOdTvDragger(DraggerType draggerType)
     {
         FinishDragger();
 
@@ -440,7 +441,9 @@ public class OdaVisualizeControl : Control
             return odTvDragger;
         }
 
-        OdTvDragger newDragger = GetOdTvDragger(draggerType);
+        OdTvDragger? newDragger = GetOdTvDragger(draggerType);
+        if (newDragger is null)
+            return null;
         _draggerCache[draggerType] = newDragger;
         return newDragger;
     }
@@ -561,20 +564,17 @@ public class OdaVisualizeControl : Control
         if (e.Button == MouseButtons.Left)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(LeftButtonDragger);
-            if (newDragger is not null)
-                StartDragger(newDragger, true);
+            StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Middle)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(MiddleButtonDragger);
-            if (newDragger is not null)
-                StartDragger(newDragger, true);
+            StartDragger(newDragger, true);
         }
         else if (e.Button == MouseButtons.Right)
         {
             OdTvDragger? newDragger = GetOrCreateOdTvDragger(RightButtonDragger);
-            if (newDragger is not null)
-                StartDragger(newDragger, true);
+            StartDragger(newDragger, true);
         }
 
         if (_dragger == null) return;
@@ -783,25 +783,28 @@ public class OdaVisualizeControl : Control
 
     #endregion Appearance commands
 
-    private void StartDragger(OdTvDragger dragger, bool useCurrentAsPrevious = false)
+    private void StartDragger(OdTvDragger? dragger, bool useCurrentAsPrevious = false)
     {
         DraggerResult res = DraggerResult.NothingToDo;
 
-        if (_dragger == null || _dragger == dragger)
-            res = dragger.Start(null, Cursor);
-        else
+        if (dragger is not null)
         {
-            OdTvDragger? pPrevDragger = _dragger;
-            if (_dragger.HasPrevious())
+            if (_dragger == null || _dragger == dragger)
+                res = dragger.Start(null, Cursor);
+            else
             {
-                DraggerResult res_prev;
-                if (useCurrentAsPrevious)
-                    _dragger.Finish(out res_prev);
-                else
-                    pPrevDragger = _dragger.Finish(out res_prev);
-                ActionAferDragger(res_prev);
+                OdTvDragger? pPrevDragger = _dragger;
+                if (_dragger.HasPrevious())
+                {
+                    DraggerResult res_prev;
+                    if (useCurrentAsPrevious)
+                        _dragger.Finish(out res_prev);
+                    else
+                        pPrevDragger = _dragger.Finish(out res_prev);
+                    ActionAferDragger(res_prev);
+                }
+                res = dragger.Start(pPrevDragger, Cursor);
             }
-            res = dragger.Start(pPrevDragger, Cursor);
         }
         // need update active dragger before calling action
         _dragger = dragger;
