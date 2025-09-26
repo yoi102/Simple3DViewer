@@ -509,8 +509,8 @@ public class OdaVisualizeControl : Control
             _renderMode = renderMode;
             RenderModeChanged?.Invoke(this, EventArgs.Empty);
         }
-
-        // enable or disable wcs, fps and grid
+        var newDragger = CreateOdTvDragger(DraggerType.Select)!;
+        _draggerCache[DraggerType.Select] = newDragger;
         OnOffViewCube(ShowViewCube);
         OnOffFPS(ShowFPS);
         OnOffWCS(ShowWCS);
