@@ -108,6 +108,9 @@ internal class OdTvSelectDragger : OdTvDragger
         _opt.setLevel(level);
     }
 
+    private int lastDragX = 0;
+    private int lastDragY = 0;
+
     public override DraggerResult NextPoint(int x, int y)
     {
         NeedFreeDrag = true;
@@ -122,6 +125,8 @@ internal class OdTvSelectDragger : OdTvDragger
 
     public override DraggerResult Drag(int x, int y)
     {
+        lastDragX = x;
+        lastDragY = y;
         if (_firstDevicePt.x == x &&
             _firstDevicePt.y == y)
             return DraggerResult.NothingToDo;
@@ -136,7 +141,6 @@ internal class OdTvSelectDragger : OdTvDragger
             EnableTemporaryObjects();
         }
 
-
         // create temporary geometry if need
 
         UpdateFrame(x, y);
@@ -145,6 +149,11 @@ internal class OdTvSelectDragger : OdTvDragger
     }
 
     public override DraggerResult NextPointUp(int x, int y)
+    {
+        return ProcessSelectionPointUp(x, y);
+    }
+
+    private DraggerResult ProcessSelectionPointUp(int x, int y)
     {
         NeedFreeDrag = false;
 
@@ -192,6 +201,14 @@ internal class OdTvSelectDragger : OdTvDragger
 
         _state = SelectState.kPoint;
         return rc;
+    }
+
+    public override OdTvDragger? Finish(out DraggerResult rc)
+    {
+        var prevDragger = base.Finish(out rc);
+        rc = ProcessSelectionPointUp(lastDragX, lastDragY);
+
+        return prevDragger;
     }
 
     public override DraggerResult ProcessEscape()

@@ -232,6 +232,7 @@ public class OdaVisualizeControl : Control
             OdTvFactoryId factId = TV_Visualize_Globals.odTvGetFactory();
             factId.removeDatabase(odaVisualizeContext.TvDatabaseId);
         }
+        _draggerCache.Clear();
         SelectionSet?.Dispose();
         SelectionSet = null;
         odaVisualizeContext = null;
@@ -509,8 +510,6 @@ public class OdaVisualizeControl : Control
             _renderMode = renderMode;
             RenderModeChanged?.Invoke(this, EventArgs.Empty);
         }
-        var newDragger = CreateOdTvDragger(DraggerType.Select)!;
-        _draggerCache[DraggerType.Select] = newDragger;
         OnOffViewCube(ShowViewCube);
         OnOffFPS(ShowFPS);
         OnOffWCS(ShowWCS);
@@ -842,6 +841,11 @@ public class OdaVisualizeControl : Control
                         _dragger.Finish(out res_prev);
                     else
                         pPrevDragger = _dragger.Finish(out res_prev);
+                    ActionAferDragger(res_prev);
+                }
+                else
+                {
+                    _dragger.Finish(out var res_prev);
                     ActionAferDragger(res_prev);
                 }
                 res = dragger.Start(pPrevDragger, Cursor);
