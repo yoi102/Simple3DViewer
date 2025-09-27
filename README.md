@@ -9,7 +9,7 @@
 **主要特性**
 
 - 支持常见格式：DWG / DGN / STEP / STP / STL / OBJ / VSF / VSFX / PRC
-
 - 基本交互：旋转、平移、缩放
+- 可使用../TestFiles/目录下文件测试
 ![Simple3DViewer](https://github.com/user-attachments/assets/047b8295-6bb0-4759-8751-5d2b99787229)
 
